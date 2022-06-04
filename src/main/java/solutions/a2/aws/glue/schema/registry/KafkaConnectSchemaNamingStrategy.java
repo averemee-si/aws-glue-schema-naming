@@ -11,7 +11,7 @@
  * the License for the specific language governing permissions and limitations under the License.
  */
 
-package eu.solutions.a2.aws.glue.schema.registry;
+package solutions.a2.aws.glue.schema.registry;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
