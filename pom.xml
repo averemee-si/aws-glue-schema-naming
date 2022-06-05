@@ -8,13 +8,13 @@
 	<version>1.0.0</version>
 
 	<name>a2-glue-schema-naming</name>
-	<url>http://a2-solutions.eu</url>
+	<url>https://a2-solutions.eu</url>
 	<description>
 		Kafka Connect Record Schema Naming Strategy for AWS Glue Schema Registry
 	</description>
 	<organization>
 		<name>A2 Rešitve, d.o.o.</name>
-		<url>http://a2-solutions.eu/</url>
+		<url>https://a2-solutions.eu/</url>
 	</organization>
 	<issueManagement>
 		<url>https://github.com/averemee-si/aws-glue-schema-naming/issues</url>
@@ -24,7 +24,7 @@
 	<licenses>
 		<license>
 			<name>Apache License</name>
-			<url>http://a2-solutions.eu/licenses/apache/LICENSE.txt</url>
+			<url>https://a2-solutions.eu/licenses/apache/LICENSE.txt</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
