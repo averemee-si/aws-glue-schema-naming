@@ -13,26 +13,26 @@
 
 package solutions.a2.aws.glue.schema.registry;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.schemaregistry.common.AWSSchemaNamingStrategy;
+import com.amazonaws.services.schemaregistry.serializers.json.JsonDataWithSchema;
 
 /**
  *  
  * @author <a href="mailto:averemee@a2.solutions">Aleksei Veremeev</a>
  * 
  */
-public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy {
+public class JsonSchemaNamingStrategy implements AWSSchemaNamingStrategy {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConnectSchemaNamingStrategy.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JsonSchemaNamingStrategy.class);
 
 	/**
 	 * Returns the schemaName.
-	 * If data passed are in org.apache.avro.generic.GenericData$Record format
-	 * data.getSchema().getFullName() is returned ('connect.name' of schema)
+	 * If data passed are in com.amazonaws.services.schemaregistry.serializers.json.JsonDataWithSchema
+	 * format 'connect.name' of schema is returned
 	 *
 	 * @param transportName topic Name or stream name etc.
 	 * @param data
@@ -40,8 +40,8 @@ public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy
 	 */
 	@Override
 	public String getSchemaName(String transportName, Object data) {
-		if (data instanceof GenericData.Record) {
-			return getConnectName((GenericData.Record) data, transportName);
+		if (data instanceof JsonDataWithSchema) {
+			return getConnectName((JsonDataWithSchema) data, transportName);
 		} else {
 			return getSchemaName(transportName);
 		}
@@ -49,8 +49,8 @@ public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy
 
 	/**
 	 * Returns the schemaName.
-	 * If data passed are in org.apache.avro.generic.GenericData$Record format
-	 * data.getSchema().getFullName() is returned ('connect.name' of schema)
+	 * If data passed are in com.amazonaws.services.schemaregistry.serializers.json.JsonDataWithSchema
+	 * format 'connect.name' of schema is returned
 	 *
 	 * @param transportName topic Name or stream name etc.
 	 * @param data
@@ -59,18 +59,26 @@ public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy
 	 */
 	@Override
 	public String getSchemaName(String transportName, Object data, boolean isKey) {
-		if (data instanceof GenericData.Record) {
-			return getConnectName((GenericData.Record) data, transportName);
+		if (data instanceof JsonDataWithSchema) {
+			return getConnectName((JsonDataWithSchema) data, transportName);
 		} else {
 			return getSchemaName(transportName);
 		}
 	}
 
-	private String getConnectName(final GenericData.Record record, final String transportName) {
-		final Schema schema = record.getSchema();
+	private String getConnectName(final JsonDataWithSchema record, final String transportName) {
+		final String schemaName = 
+			StringUtils.substringBetween(
+				StringUtils.substringBefore(
+					StringUtils.substringAfter(
+						StringUtils.substringAfter(record.getSchema(), "\"connect.name\""),
+					":"),
+				","),
+			"\"");
+		
 		LOGGER.debug("connect.name='{}' will be used as SchemaName for data in topic {}",
-				schema.getFullName(), transportName);
-		return schema.getFullName();
+				schemaName, transportName);
+		return schemaName;
 	}
 
 	/**

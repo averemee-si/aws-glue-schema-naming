@@ -13,26 +13,22 @@
 
 package solutions.a2.aws.glue.schema.registry;
 
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.schemaregistry.common.AWSSchemaNamingStrategy;
+import com.google.protobuf.DynamicMessage;
 
 /**
  *  
  * @author <a href="mailto:averemee@a2.solutions">Aleksei Veremeev</a>
  * 
- */
-public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy {
+ */public class ProtobufSchemaNamingStrategy implements AWSSchemaNamingStrategy {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConnectSchemaNamingStrategy.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufSchemaNamingStrategy.class);
 
 	/**
 	 * Returns the schemaName.
-	 * If data passed are in org.apache.avro.generic.GenericData$Record format
-	 * data.getSchema().getFullName() is returned ('connect.name' of schema)
 	 *
 	 * @param transportName topic Name or stream name etc.
 	 * @param data
@@ -40,8 +36,8 @@ public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy
 	 */
 	@Override
 	public String getSchemaName(String transportName, Object data) {
-		if (data instanceof GenericData.Record) {
-			return getConnectName((GenericData.Record) data, transportName);
+		if (data instanceof DynamicMessage) {
+			return getConnectName((DynamicMessage) data, transportName);
 		} else {
 			return getSchemaName(transportName);
 		}
@@ -49,8 +45,6 @@ public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy
 
 	/**
 	 * Returns the schemaName.
-	 * If data passed are in org.apache.avro.generic.GenericData$Record format
-	 * data.getSchema().getFullName() is returned ('connect.name' of schema)
 	 *
 	 * @param transportName topic Name or stream name etc.
 	 * @param data
@@ -59,18 +53,19 @@ public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy
 	 */
 	@Override
 	public String getSchemaName(String transportName, Object data, boolean isKey) {
-		if (data instanceof GenericData.Record) {
-			return getConnectName((GenericData.Record) data, transportName);
+		if (data instanceof DynamicMessage) {
+			return getConnectName((DynamicMessage) data, transportName);
 		} else {
 			return getSchemaName(transportName);
 		}
 	}
 
-	private String getConnectName(final GenericData.Record record, final String transportName) {
-		final Schema schema = record.getSchema();
-		LOGGER.debug("connect.name='{}' will be used as SchemaName for data in topic {}",
-				schema.getFullName(), transportName);
-		return schema.getFullName();
+	private String getConnectName(final DynamicMessage message, final String transportName) {
+		if (LOGGER.isDebugEnabled())  {
+			LOGGER.debug("connect.name='{}' will be used as SchemaName for data in topic {}",
+					message.getDescriptorForType().getName(), transportName);
+		}
+		return message.getDescriptorForType().getName();
 	}
 
 	/**

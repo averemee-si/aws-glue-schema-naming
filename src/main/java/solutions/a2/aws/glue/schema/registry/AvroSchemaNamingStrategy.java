@@ -25,9 +25,9 @@ import com.amazonaws.services.schemaregistry.common.AWSSchemaNamingStrategy;
  * @author <a href="mailto:averemee@a2.solutions">Aleksei Veremeev</a>
  * 
  */
-public class KafkaConnectSchemaNamingStrategy implements AWSSchemaNamingStrategy {
+public class AvroSchemaNamingStrategy implements AWSSchemaNamingStrategy {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConnectSchemaNamingStrategy.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AvroSchemaNamingStrategy.class);
 
 	/**
 	 * Returns the schemaName.
